@@ -138,10 +138,19 @@ final class Nominatim extends AbstractHttpProvider implements Provider
         if (!empty($postalCode)) {
             $postalCode = current(explode(';', $postalCode));
         }
+
+        $localityFields = ['city', 'town', 'village', 'hamlet'];
+        foreach ($localityFields as $localityField) {
+            $localityFieldContent = $this->getNodeValue($addressNode->getElementsByTagName($localityField));
+            if (!empty($localityFieldContent)) {
+                $builder->setLocality($localityFieldContent);
+                break;
+            }
+        }
+
         $builder->setPostalCode($postalCode);
         $builder->setStreetName($this->getNodeValue($addressNode->getElementsByTagName('road')) ?: $this->getNodeValue($addressNode->getElementsByTagName('pedestrian')));
         $builder->setStreetNumber($this->getNodeValue($addressNode->getElementsByTagName('house_number')));
-        $builder->setLocality($this->getNodeValue($addressNode->getElementsByTagName('city')) ?: $this->getNodeValue($addressNode->getElementsByTagName('town')));
         $builder->setSubLocality($this->getNodeValue($addressNode->getElementsByTagName('suburb')));
         $builder->setCountry($this->getNodeValue($addressNode->getElementsByTagName('country')));
         $builder->setCountryCode(strtoupper($this->getNodeValue($addressNode->getElementsByTagName('country_code'))));
