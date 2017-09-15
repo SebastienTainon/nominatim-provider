@@ -148,12 +148,17 @@ final class Nominatim extends AbstractHttpProvider implements Provider
             }
         }
 
+        $countryCode = $this->getNodeValue($addressNode->getElementsByTagName('country_code'));
+        if (!empty($countryCode)) {
+            $countryCode = strtoupper($countryCode);
+        }
+
         $builder->setPostalCode($postalCode);
         $builder->setStreetName($this->getNodeValue($addressNode->getElementsByTagName('road')) ?: $this->getNodeValue($addressNode->getElementsByTagName('pedestrian')));
         $builder->setStreetNumber($this->getNodeValue($addressNode->getElementsByTagName('house_number')));
         $builder->setSubLocality($this->getNodeValue($addressNode->getElementsByTagName('suburb')));
         $builder->setCountry($this->getNodeValue($addressNode->getElementsByTagName('country')));
-        $builder->setCountryCode(strtoupper($this->getNodeValue($addressNode->getElementsByTagName('country_code'))));
+        $builder->setCountryCode($countryCode);
         $builder->setCoordinates($resultNode->getAttribute('lat'), $resultNode->getAttribute('lon'));
 
         $boundsAttr = $resultNode->getAttribute('boundingbox');
